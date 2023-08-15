@@ -32,7 +32,7 @@ class Account(Aggregate):
         self._id = id
         self.full_name = full_name
         self.email_address = email_address
-        self.hashed_password = sha512(password.encode()).hexdigest()
+        self.password = password
         self.balance = 0
         self.is_closed = False
         self.overdraft_limit = 0
@@ -89,14 +89,13 @@ class Account(Aggregate):
 
         hashed_password = sha512(password.encode()).hexdigest()
 
-        if self.email_address != email_address or self.hashed_password != hashed_password:
+        if self.email_address != email_address or self.password != hashed_password:
             raise BadCredentials(email_address)
         return True
 
     @event("PasswordChanged")
     def change_password(self, new_password: str) -> None:
-        self.hashed_password = sha512(new_password.encode()).hexdigest()
-
+        self.password = sha512(new_password.encode()).hexdigest()
     def check_is_closed(self) -> bool:
         return self.is_closed
 

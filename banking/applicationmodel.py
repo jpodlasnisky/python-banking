@@ -40,12 +40,15 @@ class Bank(Application):
         The first few lines of this function are
         completed, but there is more to do.
         """
+        password = sha512(password.encode()).hexdigest()
         account = Account(
             self.get_account_id_by_email(email_address),
             full_name=full_name,
             email_address=email_address,
             password=password,
         )
+            
+                
         self.save(account)
 
         return account.id
@@ -76,7 +79,7 @@ class Bank(Application):
     def validate_password(self, account_id: UUID, password: str) -> bool:
         account = self.get_account(account_id)
         hashed_password = sha512(password.encode()).hexdigest()
-        if not hashed_password.__eq__(account.hashed_password):
+        if hashed_password != account.password:
             raise BadCredentials(account.email_address)
         return True
 
